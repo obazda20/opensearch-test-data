@@ -1,3 +1,7 @@
+# Quick fix for opensearch 2.6 
+- fix index creation
+- remove doc type
+
 # Elasticsearch For Beginners: Generate and Upload Randomized Test Data
 
 Because everybody loves test data.
