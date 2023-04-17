@@ -44,13 +44,16 @@ def delete_index(idx_name):
 def create_index(idx_name):
     schema = {
         "settings": {
-            "number_of_shards":   tornado.options.options.num_of_shards,
-            "number_of_replicas": tornado.options.options.num_of_replicas
-        },
-        "refresh": True
+            "index": {
+                "number_of_shards":   tornado.options.options.num_of_shards,
+                "number_of_replicas": tornado.options.options.num_of_replicas
+            }
+        }
     }
 
+
     body = json.dumps(schema)
+   # print(json.dumps(schema))
     url = "%s/%s" % (tornado.options.options.es_url, idx_name)
     try:
         logging.info('Trying to create index %s' % (url))
@@ -65,6 +68,7 @@ def create_index(idx_name):
 @tornado.gen.coroutine
 def upload_batch(upload_data_txt):
     try:
+        #print(upload_data_txt)
         request = tornado.httpclient.HTTPRequest(tornado.options.options.es_url + "/_bulk",
                                                  method="POST",
                                                  body=upload_data_txt,
@@ -119,7 +123,7 @@ def get_data_for_format(format):
         min = 0 if len(split_f) < 3 else int(split_f[2])
         max = min + 100000 if len(split_f) < 4 else int(split_f[3])
         return_val = generate_count(min, max)
-    
+
     elif field_type == "ipv4":
         return_val = "{0}.{1}.{2}.{3}".format(generate_count(0, 245),generate_count(0, 245),generate_count(0, 245),generate_count(0, 245))
 
@@ -261,8 +265,7 @@ def generate_test_data():
             logging.info("Loaded documents from the %s", tornado.options.options.data_file)
 
         for item in json_array:
-            cmd = {'index': {'_index': tornado.options.options.index_name,
-                             '_type': tornado.options.options.index_type}}
+            cmd = {'index': {'_index': tornado.options.options.index_name}}
             if '_id' in item:
                 cmd['index']['_id'] = item['_id']
 
@@ -281,8 +284,7 @@ def generate_test_data():
             if out_file:
                 out_file.write("%s\n" % json.dumps(item))
 
-            cmd = {'index': {'_index': tornado.options.options.index_name,
-                             '_type': tornado.options.options.index_type}}
+            cmd = {'index': {'_index': tornado.options.options.index_name}}
             if '_id' in item:
                 cmd['index']['_id'] = item['_id']
 
